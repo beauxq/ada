@@ -3,6 +3,11 @@ from fractions import Fraction
 PRINT_ALL_RESULTS = False
 
 
+def report_results(out):
+    if PRINT_ALL_RESULTS:
+        print(out)
+
+
 def f(v20):
     """ v20 is list of input data starting with 0 and ending with 0
     Between these zeros, it contains the already known Bernoulli numbers starting with 1/6
@@ -18,125 +23,102 @@ def f(v20):
     v4 = v2 * v3
     v5 = v4
     v6 = v4
-    if PRINT_ALL_RESULTS:
-        print(v4)
+    report_results(v4)
 
     # 2
     v4 = v4 - v1
-    if PRINT_ALL_RESULTS:
-        print(v4)
+    report_results(v4)
     
     # 3
     v5 = v5 + v1
-    if PRINT_ALL_RESULTS:
-        print(v5)
+    report_results(v5)
 
     # 4
     v11 = v4 / v5  # originally v11 = v5 / v4
-    if PRINT_ALL_RESULTS:
-        print(v11)
+    report_results(v11)
 
     # 5
     v11 = v11 / v2
-    if PRINT_ALL_RESULTS:
-        print(v11)
+    report_results(v11)
 
     # 6
     v13 = v13 - v11
     # A0 = v13
-    if PRINT_ALL_RESULTS:
-        print(v13)
+    report_results(v13)
 
     # 7
     v10 = v3 - v1
-    if PRINT_ALL_RESULTS:
-        print(v10)
+    report_results(v10)
 
     # 8
     v7 = v2 + v7
-    if PRINT_ALL_RESULTS:
-        print(v7)
+    report_results(v7)
 
     # 9
     v11 = v6 / v7
     # A1 = v11
-    if PRINT_ALL_RESULTS:
-        print(v11)
+    report_results(v11)
 
     # 10
     v12 = v20[1] * v11
     # B1A1 = v12
-    if PRINT_ALL_RESULTS:
-        print(v12)
+    report_results(v12)
 
     # 11
     v13 = v12 + v13
-    if PRINT_ALL_RESULTS:
-        print(v13)
+    report_results(v13)
 
     # 12
     v10 = v10 - v1
-    if PRINT_ALL_RESULTS:
-        print(v10)
+    report_results(v10)
 
     while v10 > 0:  # "Here follows a repetition of Operations thirteen to twenty-three."
         
         # 13
         v6 = v6 - v1
-        if PRINT_ALL_RESULTS:
-            print(v6)
+        report_results(v6)
 
         # 14
         v7 = v1 + v7
-        if PRINT_ALL_RESULTS:
-            print(v7)
+        report_results(v7)
 
         # 15
         v8 = v6 / v7
-        if PRINT_ALL_RESULTS:
-            print(v8)
+        report_results(v8)
 
         # 16
         v11 = v8 * v11
-        if PRINT_ALL_RESULTS:
-            print(v11)
+        report_results(v11)
 
         # 17
         v6 = v6 - v1
-        if PRINT_ALL_RESULTS:
-            print(v6)
+        report_results(v6)
 
         # 18
         v7 = v1 + v7
-        if PRINT_ALL_RESULTS:
-            print(v7)
+        report_results(v7)
 
         # 19
         v9 = v6 / v7
-        if PRINT_ALL_RESULTS:
-            print(v9)
+        report_results(v9)
 
         # 20
         v11 = v9 * v11
         # A3 = v11
-        if PRINT_ALL_RESULTS:
-            print(v11)
+        report_results(v11)
 
         # 21
         v12 = v20[int(v3 - v10)] * v11
         # B3A3 = v12 (B5A5...)
-        if PRINT_ALL_RESULTS:
-            print(v12)
+        report_results(v12)
 
         # 22
         v13 = v12 + v13
-        if PRINT_ALL_RESULTS:
-            print(v13)
+        report_results(v13)
 
         # 23
         v10 = v10 - v1
-        if PRINT_ALL_RESULTS:
-            print(v10)
+        report_results(v10)
 
     # 24
     v20[int(v3)] = v20[int(v3)] - v13  # originally v20[int(v3)] = v13 + v20[int(v3)]
