@@ -13,9 +13,11 @@ def f(v20):
     Between these zeros, it contains the already known Bernoulli numbers starting with 1/6
     Ada's variable names for this are v21, v22, v23, etc. """
 
-    v1 = Fraction(1)
-    v2 = Fraction(2)
-    v3 = Fraction(len(v20) - 1)
+    v1 = Fraction(1)  # a constant
+    v2 = Fraction(2)  # a constant
+    v3 = Fraction(len(v20) - 1)  # indicates which Bernoulli number is being calculated
+    # Ada shows all of the working variables initialized to 0
+    # but only 2 of those initializations matter
     v7 = Fraction(0)
     v13 = Fraction(0)
 
@@ -47,7 +49,7 @@ def f(v20):
     report_results(v13)
 
     # 7
-    v10 = v3 - v1
+    v10 = v3 - v1  # v10 is a control variable, not used in any calculations that go to the output
     report_results(v10)
 
     # 8
@@ -124,7 +126,7 @@ def f(v20):
     v20[int(v3)] = v20[int(v3)] - v13  # originally v20[int(v3)] = v13 + v20[int(v3)]
 
     # 25
-    v3 = v1 + v3
+    v3 = v1 + v3  # this is just preparation to calculate the next Bernoulli number
 
     return v20[int(v3 - 1)]
 
