@@ -3,13 +3,15 @@ from fractions import Fraction
 PRINT_ALL_RESULTS = False
 
 
-def report_results(out):
+def report_results(*argv):
+    """ debugging """
     if PRINT_ALL_RESULTS:
-        print(out)
+        print(*argv)
+
 
 
 def f(v20):
-    """ v20 is list of input data starting with 0 and ending with 0
+    """ v20 is list of result variables - input data starting with 0 and ending with 0
     Between these zeros, it contains the already known Bernoulli numbers starting with 1/6
     Ada's variable names for this are v21, v22, v23, etc. """
 
