@@ -15,13 +15,26 @@ I add "i" to variable names if the integer data structure suffices for that vari
 Lastly, given these previous solutions, the problem of division has disappeared.
 (Dividing by 2/3 is just multiplying by 3/2.)
 
-I'm not worrying about reducing fractions right now. Maybe later.
-(It looks like reducing fractions would bring back the problem of division.)
-Not reducing fractions makes this very slow and requires many bits per integer.
+Reducing fractions is required in order to not quickly get into ridiculous
+processing times and ridiculous bit lengths per integer.
+
+Without reducing fractions:
 Calculating B8 (the 4th non-trivial Bernoulli number) requires integers >32 bits
 and ~20 seconds of processing time on a core i7.
 Calculating B10 (the 5th non-trivial Bernoulli number) requires integers >64 bits
-and many hours of processing time on a core i7.
+and I don't know how much processing time. I stopped it at 7 hours.
+
+The machine I was thinking of is 8 bits, so I would like to see how far I can get with that.
+Obviously B12 (-691 / 2730) has both a numerator and denominator that don't fit in 8 bits.
+So I guess B10 is the goal.
+
+Reducing fractions brings back the problem of division that had disappeared.
+But that's not hard to implement in software, just like multiplication.
+We can get to B6 by simply reducing some of the fractions after calculating them.
+But that's not enough for B8 and B10. We'll need another subroutine for adding 2 fractions.
+The most common (and most efficient) method for finding the lowest common denominator
+involves multiplying the denominators, but that completely defeats the purpose
+if we need to stay in 8 bits.
 """
 
 PRINT_ALL_RESULTS = False
@@ -43,22 +56,71 @@ def multiply(a, b):
     while a > 0:
         to_return = to_return + b
         a = a - 1
+    if to_return > 255:
+        print("warning: multiply result", to_return, "won't work in 8 bits")
     return to_return
 
 
 def add_n(an, ad, bn, bd):
     """
     get (unreduced) numerator from adding two fractions given 2 numerators and 2 denominators
-
-    Note that every time this is called, it is adding (what could be global) v12 and v13
-    and storing the result in (what could be global) v13n.
-    The implementation could be optimized for that, instead of passing parameters and returning a value.
-    This subroutine would not even need any working variables, because v12n is reassigned before it is referenced again.
     """
+    # Note that every time this is called, it is adding (what could be global) v12 and v13
+    # and storing the result in (what could be global) v13n.
+    # The implementation could be optimized for that, instead of passing parameters and returning a value.
+    # This subroutine would not even need any working variables, because v12n is reassigned before it is referenced again.
+
     an = multiply(an, bd)
     bn = multiply(bn, ad)
     an = an + bn
     return an
+
+
+def divide(a, b):
+    """
+    integer division (using only addition and subtraction)
+    only works with positive b
+    """
+    a_sign = 1  # 1 or -1
+    if a < 0:
+        a_sign = -1
+        a = 0 - a
+    count = 0
+    while a >= b:
+        a = a - b
+        count = count + 1
+    return multiply(a_sign, count)
+
+
+def gcd(a, b):
+    """ greatest common divisor (a and b both positive) """
+    # I want to implement this without a stack (no recursion)
+    # just in case this simpler machine can't handle a stack
+    # (no dynamic memory management, using all the memory for one of each function call)
+    while a != b:
+        if a > b:
+            a = a - b
+        else:
+            b = b - a
+    return a
+
+
+def reduce(n, d):
+    """ reduce fraction """
+    # It might be enough reduction to only ever reduce v13
+    # which means it could be optimized to hard code the memory addresses of v13
+    # instead of passing parameters and return values
+    # 
+    # In 8 bits, reducing only v13 is enough to calculate B4, but not enough for B6
+    if d < 0:
+        # swap both signs
+        n = 0 - n
+        d = 0 - d
+    positive_n = n
+    if n < 0:
+        positive_n = 0 - positive_n
+    divisor = gcd(positive_n, d)
+    return divide(n, divisor), divide(d, divisor)
 
 
 def f(v20n, v20d):
@@ -128,6 +190,7 @@ def f(v20n, v20d):
     # v13 = v13 - v11
     v13n = v13n - v11n  # v13n is initialized to 0
     v13d = v11d
+    v13n, v13d = reduce(v13n, v13d)
     # A0 = v13
     report_results(v13n, "/", v13d)
 
@@ -157,6 +220,7 @@ def f(v20n, v20d):
     # v13 = v12 + v13
     v13n = add_n(v12n, v12d, v13n, v13d)
     v13d = multiply(v12d, v13d)
+    v13n, v13d = reduce(v13n, v13d)
     report_results(v13n, "/", v13d)
 
     # 12
@@ -183,6 +247,7 @@ def f(v20n, v20d):
         # v11 = v8 * v11
         v11n = multiply(v8n, v11n)
         v11d = multiply(v8d, v11d)
+        v11n, v11d = reduce(v11n, v11d)
         report_results(v11n, "/", v11d)
 
         # 17
@@ -203,6 +268,7 @@ def f(v20n, v20d):
         # v11 = v9 * v11
         v11n = multiply(v9n, v11n)
         v11d = multiply(v9d, v11d)
+        v11n, v11d = reduce(v11n, v11d)
         # A3 = v11
         report_results(v11n, "/", v11d)
 
@@ -210,6 +276,7 @@ def f(v20n, v20d):
         # v12 = v20[v3i - v10i] * v11
         v12n = multiply(v20n[v3i - v10i], v11n)
         v12d = multiply(v20d[v3i - v10i], v11d)
+        v12n, v12d = reduce(v12n, v12d)
         # B3A3 = v12 (B5A5...)
         report_results(v12n, "/", v12d)
 
@@ -217,6 +284,7 @@ def f(v20n, v20d):
         # v13 = v12 + v13
         v13n = add_n(v12n, v12d, v13n, v13d)
         v13d = multiply(v12d, v13d)
+        v13n, v13d = reduce(v13n, v13d)
         report_results(v13n, "/", v13d)
 
         # 23
