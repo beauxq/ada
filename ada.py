@@ -15,12 +15,12 @@ def f(v20):
     Between these zeros, it contains the already known Bernoulli numbers starting with 1/6
     Ada's variable names for this are v21, v22, v23, etc. """
 
-    v1 = Fraction(1)  # a constant
-    v2 = Fraction(2)  # a constant
-    v3 = Fraction(len(v20) - 1)  # indicates which Bernoulli number is being calculated
+    v1 = 1  # a constant
+    v2 = 2  # a constant
+    v3 = len(v20) - 1  # indicates which Bernoulli number is being calculated
     # Ada shows all of the working variables initialized to 0
     # but only 2 of those initializations matter
-    v7 = Fraction(0)
+    v7 = 0
     v13 = Fraction(0)
 
     # 1
@@ -38,7 +38,7 @@ def f(v20):
     report_results(v5)
 
     # 4
-    v11 = v4 / v5  # originally v11 = v5 / v4
+    v11 = Fraction(v4, v5)  # published with bug v11 = Fraction(v5, v4)
     report_results(v11)
 
     # 5
@@ -59,7 +59,7 @@ def f(v20):
     report_results(v7)
 
     # 9
-    v11 = v6 / v7
+    v11 = Fraction(v6, v7)
     # A1 = v11
     report_results(v11)
 
@@ -87,7 +87,7 @@ def f(v20):
         report_results(v7)
 
         # 15
-        v8 = v6 / v7
+        v8 = Fraction(v6, v7)
         report_results(v8)
 
         # 16
@@ -103,7 +103,7 @@ def f(v20):
         report_results(v7)
 
         # 19
-        v9 = v6 / v7
+        v9 = Fraction(v6, v7)
         report_results(v9)
 
         # 20
@@ -112,7 +112,7 @@ def f(v20):
         report_results(v11)
 
         # 21
-        v12 = v20[int(v3 - v10)] * v11
+        v12 = v20[v3 - v10] * v11
         # B3A3 = v12 (B5A5...)
         report_results(v12)
 
@@ -125,12 +125,12 @@ def f(v20):
         report_results(v10)
 
     # 24
-    v20[int(v3)] = v20[int(v3)] - v13  # originally v20[int(v3)] = v13 + v20[int(v3)]
+    v20[v3] = v20[v3] - v13  # published as v20[v3] = v13 + v20[v3]
 
     # 25
     v3 = v1 + v3  # this is just preparation to calculate the next Bernoulli number
 
-    return v20[int(v3 - 1)]
+    return v20[v3 - 1]
 
 
 def bn(n):
