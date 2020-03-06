@@ -31,10 +31,28 @@ So I guess B10 is the goal.
 Reducing fractions brings back the problem of division that had disappeared.
 But that's not hard to implement in software, just like multiplication.
 We can get to B6 by simply reducing some of the fractions after calculating them.
-But that's not enough for B8 and B10. We'll need another subroutine for adding 2 fractions.
-The most common (and most efficient) method for finding the lowest common denominator
-involves multiplying the denominators, but that completely defeats the purpose
-if we need to stay in 8 bits.
+But that's not enough for B8 and B10.
+We'll need another subroutine for adding 2 fractions.
+The most common (and most efficient on most computers) method for finding
+the lowest common denominator involves multiplying the denominators,
+but that completely defeats the purpose if we need to stay in 8 bits.
+
+On this machine it is more efficient to find the lowest common denominator in the
+process of adding the fractions, instead of as a first step to adding the fractions.
+
+In the calculations of B10, there's one point when the multiplication of 2 fractions
+is 7/5 * 30/1 = 210/5.
+210 is an overflow in 8-bit signed integers.
+The result can be reduced to fit in 8 bits (42/1), but it can't be reduced IN 8 bits.
+Overflow can be avoided by doing a cross-reduction before the multiplication.
+Reduce 30/5 and 7/1 to 6/1 and 7/1, then multiply to get the already reduced 42/1.
+I guess it's kind of cheating to write the program already knowing all the results
+of everything it needs to do, but I'm only doing this cross-reduction for the one
+place where I know it would otherwise overflow.
+It could be done for every fraction multiplication, but in most places
+I think it would add more memory requirements and processing for no benefit.
+I'm not sure about that. It could be less processing in some cases,
+but it would add more memory requirements either way.
 """
 
 PRINT_ALL_RESULTS = False
@@ -56,24 +74,25 @@ def multiply(a, b):
     while a > 0:
         to_return = to_return + b
         a = a - 1
-    if to_return > 255:
-        print("warning: multiply result", to_return, "won't work in 8 bits")
+    if to_return > 127 or to_return < -128:
+        report_results("warning: multiply result", to_return, "won't work in 8 bits")
     return to_return
 
 
-def add_n(an, ad, bn, bd):
-    """
-    get (unreduced) numerator from adding two fractions given 2 numerators and 2 denominators
-    """
-    # Note that every time this is called, it is adding (what could be global) v12 and v13
-    # and storing the result in (what could be global) v13n.
-    # The implementation could be optimized for that, instead of passing parameters and returning a value.
-    # This subroutine would not even need any working variables, because v12n is reassigned before it is referenced again.
-
-    an = multiply(an, bd)
-    bn = multiply(bn, ad)
-    an = an + bn
-    return an
+def add_fractions(an, ad, bn, bd):
+    # find LCD at the same time as multiplying the numerators
+    alcd = ad
+    blcd = bd
+    anm = an  # a numerator multiplied
+    bnm = bn  # b numerator multiplied
+    while alcd != blcd:
+        if alcd < blcd:
+            alcd = alcd + ad
+            anm = anm + an
+        else:
+            blcd = blcd + bd
+            bnm = bnm + bn
+    return anm + bnm, alcd
 
 
 def divide(a, b):
@@ -218,8 +237,7 @@ def f(v20n, v20d):
 
     # 11
     # v13 = v12 + v13
-    v13n = add_n(v12n, v12d, v13n, v13d)
-    v13d = multiply(v12d, v13d)
+    v13n, v13d = add_fractions(v12n, v12d, v13n, v13d)
     v13n, v13d = reduce(v13n, v13d)
     report_results(v13n, "/", v13d)
 
@@ -241,12 +259,14 @@ def f(v20n, v20d):
         # v8 = v6 / v7
         v8n = v6i
         v8d = v7i
+        v8n, v8d = reduce(v8n, v8d)
         report_results(v8n, "/", v8d)
 
         # 16
         # v11 = v8 * v11
-        v11n = multiply(v8n, v11n)
-        v11d = multiply(v8d, v11d)
+        v11nr, v8dr = reduce(v11n, v8d)  # this just needed to not overflow in 8 bits when calculating B10 (210 as 8-bit signed int)
+        v11n = multiply(v8n, v11nr)
+        v11d = multiply(v8dr, v11d)
         v11n, v11d = reduce(v11n, v11d)
         report_results(v11n, "/", v11d)
 
@@ -262,6 +282,7 @@ def f(v20n, v20d):
         # v9 = v6i / v7i
         v9n = v6i
         v9d = v7i
+        v9n, v9d = reduce(v9n, v9d)
         report_results(v9n, "/", v9d)
 
         # 20
@@ -282,8 +303,7 @@ def f(v20n, v20d):
 
         # 22
         # v13 = v12 + v13
-        v13n = add_n(v12n, v12d, v13n, v13d)
-        v13d = multiply(v12d, v13d)
+        v13n, v13d = add_fractions(v12n, v12d, v13n, v13d)
         v13n, v13d = reduce(v13n, v13d)
         report_results(v13n, "/", v13d)
 
