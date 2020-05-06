@@ -9,7 +9,6 @@ def report_results(*argv):
         print(*argv)
 
 
-
 def f(v20):
     """ v20 is list of result variables - input data starting with 0 and ending with 0
     Between these zeros, it contains the already known Bernoulli numbers starting with 1/6
@@ -32,7 +31,7 @@ def f(v20):
     # 2
     v4 = v4 - v1
     report_results(v4)
-    
+
     # 3
     v5 = v5 + v1
     report_results(v5)
@@ -77,7 +76,7 @@ def f(v20):
     report_results(v10)
 
     while v10 > 0:  # "Here follows a repetition of Operations thirteen to twenty-three."
-        
+
         # 13
         v6 = v6 - v1
         report_results(v6)
@@ -114,6 +113,9 @@ def f(v20):
         # 21
         v12 = v20[v3 - v10] * v11
         # B3A3 = v12 (B5A5...)
+        # Lovelace wrote about this v20[v3 - v10] indexing thus:
+        # "Operation 21 always requires one of its factors from a new column"
+        # (continued in Operation 24)
         report_results(v12)
 
         # 22
@@ -126,6 +128,8 @@ def f(v20):
 
     # 24
     v20[v3] = v20[v3] - v13  # published as v20[v3] = v13 + v20[v3]
+    # ...and (continued from Op 21) Lovelace wrote about this v20[v3] indexing:
+    # "and Operation 24 always puts its result on a new column."
 
     # 25
     v3 = v1 + v3  # this is just preparation to calculate the next Bernoulli number
